@@ -85,7 +85,7 @@ class AuthenticationToken(object):
 
         return True
 
-    def authenticate(self, username, password, invalidate_previous=False):
+    def authenticate(self, username, password, invalidate_previous=False, proxy_dict=None):
         """
         Authenticates the user against https://authserver.mojang.com using
         `username` and `password` parameters.
@@ -119,7 +119,7 @@ class AuthenticationToken(object):
             # is `None` generate a `client_token` using uuid4
             payload["clientToken"] = self.client_token or uuid.uuid4().hex
 
-        res = _make_request(AUTH_SERVER, "authenticate", payload)
+        res = _make_request(AUTH_SERVER, "authenticate", payload, proxy_dict)
 
         _raise_from_response(res)
 
@@ -265,7 +265,7 @@ class AuthenticationToken(object):
         return True
 
 
-def _make_request(server, endpoint, data):
+def _make_request(server, endpoint, data, proxy_dict=None):
     """
     Fires a POST with json-packed data to the given endpoint and returns
     response.
@@ -278,7 +278,7 @@ def _make_request(server, endpoint, data):
         A `requests.Request` object.
     """
     res = requests.post(server + "/" + endpoint, data=json.dumps(data),
-                        headers=HEADERS, timeout=15)
+                        headers=HEADERS, timeout=15, proxies=proxy_dict)
     return res
 
 
