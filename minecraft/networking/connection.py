@@ -54,6 +54,13 @@ class ConnectionContext(object):
            later than, or is equal to, 'other_pv', or else False."""
         return utility.protocol_earlier_eq(other_pv, self.protocol_version)
 
+    def protocol_in_range(self, start_pv, end_pv):
+        """Returns True if the protocol version of this context was published
+           later than, or is equal to, 'start_pv' and was published earlier
+           than 'end_pv' (analogously to Python's 'range' function)."""
+        return (utility.protocol_earlier(self.protocol_version, end_pv) and
+                utility.protocol_earlier_eq(start_pv, self.protocol_version))
+
 
 class _ConnectionOptions(object):
     def __init__(self, address=None, port=None, compression_threshold=-1,
@@ -163,7 +170,7 @@ class Connection(object):
             self.default_proto_version = proto_version(initial_version)
 
         self.context = ConnectionContext(protocol_version=latest_allowed_proto)
-        
+
         self.proxy = proxy
         self.options = _ConnectionOptions()
         self.options.address = address
